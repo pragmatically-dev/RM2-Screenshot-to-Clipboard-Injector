@@ -42,7 +42,7 @@ python deploy.py
 *(Make sure to update the IP and SSH password inside `deploy.py` if necessary).*
 
 ## Acknowledgments
-This project would not have been possible without the incredible foundational work, tools, and research provided by the ReMarkable homebrew community. Special thanks to the following individuals for their related contributions:
+This project would not have been possible without the incredible foundational work, tools, and research provided by the ReMarkable community. Special thanks to the following individuals for their related contributions:
 - **[asivery](https://github.com/asivery)** - For `xovi`, `qmldiff`, and `framebuffer-spy`.
 - **[HookedBehemoth](https://github.com/HookedBehemoth)** - For reverse-engineering efforts and QML research.
 - **[ingatellent](https://github.com/ingatellent)** - For the `stickers` extension which inspired the vtable injection approach.
