@@ -3,7 +3,7 @@ import os
 
 HOST = '10.11.99.1'
 USER = 'root'
-PASS = 'ngJ7BlCwD3'
+PASS = 'ngJ7BlCwD3' #It's bad, I know, but this device does not get expose to the WAN
 LOCAL_SO = os.path.join(os.path.dirname(__file__), 'clipboard-injector.so')
 REMOTE_SO = '/home/root/xovi/extensions.d/clipboard-injector.so'
 
