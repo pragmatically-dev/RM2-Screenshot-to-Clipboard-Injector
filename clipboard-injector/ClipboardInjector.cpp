@@ -283,9 +283,9 @@ static bool writeClipboardJSON(const float *lines, int lineCount,
         obj["rgba"] = (double)0xFF000000u;
         obj["color"] = 0;
         obj["bounds"] = bounds;
-        obj["tool"] = 0x17;
+        obj["tool"] = 15; // Fineliner (sharper lines)
         obj["maskScale"] = 1.0;
-        obj["thickness"] = 0.0;
+        obj["thickness"] = 0.25; // Super thin lines for high resolution
         arr << obj;
     }
 
