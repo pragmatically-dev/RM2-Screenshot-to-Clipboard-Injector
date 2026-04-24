@@ -1,37 +1,40 @@
-# DRAWJ2D-GOLANG PORT
+# ReMarkable Clipboard Injector
 
-[![rm1](https://img.shields.io/badge/rM1-supported-green)](https://remarkable.com/store/remarkable)
-[![rm2](https://img.shields.io/badge/rM2-supported-green)](https://remarkable.com/store/remarkable-2)
-[![Discord](https://img.shields.io/discord/385916768696139794.svg?label=reMarkable&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/ATqQGfu)
-[![rM Hacks Discord](https://img.shields.io/discord/1153374327123759104.svg?label=rM%20Hacks&logo=discord&logoColor=ffffff&color=ffb759&labelColor=d99c4c)](https://discord.gg/bgVXW2bchN)
+A native C++/Qt extension for the ReMarkable 2 tablet that allows you to instantly capture any region of the screen (using an interactive drag-to-select overlay) and paste it back into your notebooks as editable vector strokes.
 
+## Features
+- **Snipping Tool Overlay**: Darkens the screen and lets you draw a selection rectangle over the content you want to copy.
+- **NEON-Accelerated Processing**: Captures the raw framebuffer and performs high-speed Gaussian blurring and Laplacian edge detection entirely on-device using ARM NEON intrinsics.
+- **Native Vector Paste**: Converts the selected area into editable vector lines and injects them directly into the `xochitl` scene graph via the tablet's clipboard. No PDF disruption.
 
-This port is meant to be run on the remarkable tablet a Golang + C implementation of remarkable drawj2d conversion code
+## Repository Structure
+- `clipboard-injector/`: The main C++/Qt source code and `.qmd` UI injection scripts.
+- `qmldiff_repo/`: Rust tool used to hash the QMD files before deployment.
+- `deploy.py`: Python script to push the compiled `.so` extension to the tablet and restart `xochitl`.
+- `hashtab.txt`: The QML hash mapping file required by `qmldiff` to patch the tablet's UI safely.
 
-## Requirements:
-- rm-hacks (enables screenshot feature): https://github.com/mb1986/rm-hacks
+## Build Instructions
+The project uses a cross-compilation Docker container. To build the extension:
 
-- webinterface-onboot: https://github.com/rM-self-serve/webinterface-onboot 
-
-
-⚠️ Please be sure to have rm-hacks and webinterface-onboot Installed⚠️
-
-
-1. **Transfrer the client installer tar to the remarkable:**
-
-   then:
-   - 
+1. Update your QMD files (if modifying the UI) and hash them:
    ```bash
-   $remarkable: ~/ tar -xvf drawj2d-rm.tar
-   $remarkable: ~/ cd drawj2d-rm
-   $remarkable: ~/ ./install.sh
-
+   docker run --rm -v "%CD%:/work" -w /work rust:latest ./qmldiff_repo/target/release/qmldiff hash-diffs hashtab.txt clipboard-injector/plain.qmd
    ```
----
+2. Build the Docker container (which cross-compiles the C++ code with NEON support):
+   ```bash
+   cd clipboard-injector
+   docker build --no-cache -t clipboard-injector .
+   ```
+3. Extract the compiled `.so`:
+   ```bash
+   docker create --name ci-build clipboard-injector
+   docker cp ci-build:/src/clipboard-injector.so ./clipboard-injector.so
+   docker rm ci-build
+   ```
 
-Now you should be able to convert your screenshots to rmlines in 3 sec
-
-## Benchmark:
-
-<img src="remarkablepage/bench/cpu-new-bench-CPROCESSING.prof.svg" alt="Benchmark" width="800" height="600">
-
+## Deployment
+Run the deployment script to send the extension to the ReMarkable tablet over USB/Wi-Fi:
+```bash
+python deploy.py
+```
+*(Make sure to update the IP and SSH password inside `deploy.py` if necessary).*
